@@ -1,0 +1,34 @@
+#include <OneWire.h>
+#include <DallasTemperature.h>
+
+// Data wire is plugged into D1 on the ESP8266
+#define ONE_WIRE_BUS D1
+
+// A OneWire instance is created to communicate with the sensor
+OneWire oneWire(ONE_WIRE_BUS);
+
+//                      We connect the OneWire bus with the temperature sensor.
+DallasTemperature sensors(&oneWire);
+
+void setup(void)
+{
+
+  Serial.begin(9600);
+  Serial.println("Starting to measure temperature...");
+
+  sensors.begin();
+}
+
+void loop(void)
+{
+
+  delay(3000);
+  Serial.print("Requesting temperature...");
+
+  sensors.requestTemperatures(); // Send the command to get the temperature
+  Serial.println("DONE");
+
+  Serial.print("Temperature is: ");
+  Serial.println(sensors.getTempCByIndex(0));
+
+}
