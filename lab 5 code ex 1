@@ -1,0 +1,37 @@
+#include "thingProperties.h"
+
+void setup() {
+  // Initialize serial and wait for port to open:
+  Serial.begin(9600);
+  // This delay gives the chance to wait for a Serial Monitor without blocking
+  delay(1500);
+
+  // Defined in thingProperties.h
+  initProperties();
+
+  // Connect to Arduino IoT Cloud
+  ArduinoCloud.begin(ArduinoIoTPreferredConnection);
+
+  // Set debug message level (more info about connection and errors)
+  setDebugMessageLevel(2);
+  ArduinoCloud.printDebugInfo();
+  pinMode(LED_BUILTIN, OUTPUT);
+}
+void loop() {
+  // ArduinoCloud.update is likely called to maintain a connection to the Arduino Cloud platform
+  ArduinoCloud.update();
+
+  // generate a random number from 0 to 299
+  randomvalue = random(300);
+
+  // wait for 1 second
+  delay(1000);
+}
+/*                          Since MyESPLED is READ_WRITE variable, onMyESPLEDChange() is
+                              executed every time a new value is received from IoT Cloud.
+*/
+
+void onMyESPLEDChange() {
+  // Add your code here to act upon MyESPLED change
+  digitalWrite(LED_BUILTIN, myESP_LED);
+}
