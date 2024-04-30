@@ -1,0 +1,54 @@
+#include <DallasTemperature.h>
+#include <OneWire.h>
+#define ONE_WIRE_BUS D1
+OneWire oneWire(ONE_WIRE_BUS);
+DallasTemperature sensors(&oneWire);
+
+const int smokePin = A0; // Replace with your actual analog pin
+int smokeValue;
+
+void setup() {
+  // Initialize serial
+  Serial.begin(9600);
+
+  // Start the OneWire library
+  sensors.begin();
+
+  // Delay for Serial Monitor
+  delay(1500);
+
+  // Initialize smoke sensor pin
+  pinMode(smokePin, INPUT);
+}
+
+void loop() {
+  // Request temperature readings from all DS18B20 sensors
+  sensors.requestTemperatures();
+  float tempC = sensors.getTempCByIndex(0);
+  // Output temperature to Serial Monitor
+  Serial.print("Temperature: ");
+  Serial.print(tempC);
+  Serial.println(" °C");
+
+  // Read smoke sensor value
+  smokeValue = analogRead(smokePin);
+  // Output smoke value to Serial Monitor
+  Serial.print("Smoke Value: ");
+  Serial.println(smokeValue);
+
+  // Update smoke message based on smoke value
+  if (smokeValue > 200) {
+    Serial.println("Fire situation: smoke value is above 200");
+  } else {
+    Serial.println("Normal situation: smoke value is below 200");
+  }
+
+  // Update message based on temperature
+  if (tempC > 50) {
+    Serial.println("Temperature is above 50 degrees Celsius");
+  } else {
+    Serial.println("Temperature is below 50 degrees Celsius");
+  }
+
+  delay(1000);
+}
