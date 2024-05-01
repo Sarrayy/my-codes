@@ -1,0 +1,76 @@
+#include <DallasTemperature.h>
+#include <OneWire.h>
+
+#define ONE_WIRE_BUS D1
+OneWire oneWire(ONE_WIRE_BUS);
+DallasTemperature sensors(&oneWire);
+
+const int smokePin = A0; // Replace with your actual analog pin
+int smokeValue;
+const int buzzerPin = D2; // Replace with your actual pin for the passive buzzer
+const int ledPin = D3;    // Replace with your actual pin for the LED
+
+void setup() {
+  // Initialize serial
+  Serial.begin(9600);
+
+  // Start the OneWire library
+  sensors.begin();
+
+  // Delay for Serial Monitor
+  delay(1500);
+
+  // Initialize smoke sensor pin
+  pinMode(smokePin, INPUT);
+
+  // Initialize passive buzzer pin
+  pinMode(buzzerPin, OUTPUT);
+
+  // Initialize LED pin
+  pinMode(ledPin, OUTPUT);
+}
+
+void loop() {
+  // Request temperature readings from all DS18B20 sensors
+  sensors.requestTemperatures();
+  float tempC = sensors.getTempCByIndex(0);
+  
+  // Read smoke sensor value
+  smokeValue = analogRead(smokePin);
+
+  // Output temperature and smoke value to Serial Monitor
+  Serial.print("Temperature: ");
+  Serial.print(tempC);
+  Serial.println(" °C");
+  Serial.print("Smoke Value: ");
+  Serial.println(smokeValue);
+
+  // Check if temperature exceeds 50 degrees Celsius or smoke value exceeds 200
+  if (tempC > 28 || smokeValue > 70) {
+    // Activate passive buzzer
+    playBuzzer();
+    // Turn on LED
+    digitalWrite(ledPin, HIGH);
+    Serial.println("Warning: Temperature or smoke value exceeded threshold!");
+  } else {
+    // Deactivate passive buzzer
+    noTone(buzzerPin);
+    // Turn off LED
+    digitalWrite(ledPin, LOW);
+    Serial.println("Normal situation: Temperature and smoke value are within limits.");
+  }
+
+  delay(1000);
+}
+
+void playBuzzer() {
+  // Melody definition
+  int melody[] = {262, 294, 330, 349, 392, 440, 494};
+  int noteDuration = 250;
+  
+  // Play the melody
+  for (int i = 0; i < 7; i++) {
+    tone(buzzerPin, melody[i], noteDuration);
+    delay(noteDuration);
+  }
+}
